@@ -19,15 +19,29 @@ powerConsumption.data <- read.table(dataset.path,sep=";",header =  TRUE,na.strin
 #Subsetting data
 powerConsumption.data2 <- subset(powerConsumption.data,Date=="1/2/2007" | Date=="2/2/2007")                                   
 
+#Creating the variable dateTime
+powerConsumption.data2$dateTime <- 
+  strptime(paste(powerConsumption.data2$Date,powerConsumption.data2$Time), "%d/%m/%Y %H:%M:%S")
+
+#We need to change the system local time to show the days of the week using english language
+#if we are in a not english speaking country
+lct <- Sys.getlocale("LC_TIME")
+Sys.setlocale("LC_TIME", "C")
+
 #Redirecting output to png file
 #It's no necessary to set height, width and units to 480x480 pixels 
 #because these are the default values.
 #We set these values to ease the code reading
-png("plot1.png", height=480, width=480,units="px")
-  hist(powerConsumption.data2$Global_active_power,col="red",main="Global Active Power",
-       xlab="Global Active Power (kilowatts)")
+png("plot2.png", height=480, width=480,units="px")
+  with(powerConsumption.data2,
+       plot(dateTime,Global_active_power,type="l",xlab="",ylab="Global Active Power (kilowatts)")
+       )
 dev.off()
+
+#We reset the system local time again to its origin value
+Sys.setlocale("LC_TIME", lct)
 
 remove(powerConsumption.data)
 remove(powerConsumption.data2)
 remove(dataset.path)
+remove(lct)
